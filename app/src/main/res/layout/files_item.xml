@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/item"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:foreground="?selectableItemBackground">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:duplicateParentState="true"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <FrameLayout
+            android:id="@+id/icon_layout"
+            android:layout_width="@dimen/touch_target_size"
+            android:layout_height="@dimen/touch_target_size"
+            android:layout_marginStart="@dimen/screen_edge_margin_minus_4dp"
+            android:layout_marginEnd="@dimen/content_start_from_screen_edge_margin_minus_44dp"
+            android:clipToPadding="false"
+            android:padding="@dimen/touch_target_large_icon_padding">
+
+            <ImageView
+                android:id="@+id/image"
+                android:scaleType="centerCrop"
+                android:layout_gravity="center_vertical"
+                android:layout_width="@dimen/thumbnail_size"
+                android:layout_height="@dimen/thumbnail_size"
+                android:contentDescription="icon"/>
+        </FrameLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:duplicateParentState="true"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/text"
+                android:maxLines="1"
+                android:textSize="18sp"
+                android:layout_marginStart="@dimen/global_padding"
+                android:layout_gravity="center_vertical"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+        </LinearLayout>
+
+        <androidx.appcompat.widget.AppCompatImageButton
+            android:id="@+id/menu"
+            android:layout_width="@dimen/touch_target_size"
+            android:layout_height="@dimen/touch_target_size"
+            android:layout_marginStart="@dimen/content_start_from_screen_edge_margin_minus_36dp_considering_at_least_8dp"
+            android:layout_marginEnd="@dimen/screen_edge_margin_minus_12dp_at_least_8dp"
+            android:background="@drawable/selectable_item_background_oval"
+            android:padding="@dimen/touch_target_icon_padding"
+            android:src="@drawable/more_vertical_icon_white_24dp"
+            android:tint="?colorControlNormal" />
+    </LinearLayout>
+
+</RelativeLayout>

@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="colorPrimaryLight">#E8ECF1</color>
-    <color name="colorPrimary">#02A6FF</color>
-    <color name="colorPrimaryDark">#02A6FF</color>
-    <color name="colorAccent">#02A6FF</color>
+    <color name="colorPrimary">#004546</color>
+    <color name="colorPrimaryDark">#004546</color>
+    <color name="colorAccent">#004546</color>
 
     <color name="opt_icon_color_blue">#02A6FF</color>
 
-    <color name="textColor">#8a1c44</color>
+    <color name="textColor">#004546</color>
     <color name="tab_indicator_gray">#c0c0c0</color>
 
     <color name="grad_back_top">#38D5FE</color>
