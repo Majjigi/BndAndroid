@@ -1,23 +1,56 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:weightSum="4"
     tools:context=".activity.homeScreen.MainActivity">
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/files_list"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
-
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
+    <Button
         android:id="@+id/upload_btn"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentBottom="true"
-        android:layout_margin="@dimen/fab_margin"
-        android:src="@drawable/ic_add_white_24dp"
-        app:borderWidth="0dp" />
-</RelativeLayout>
+        android:layout_weight="1"
+        android:text="Upload"
+        android:layout_marginTop="50dp"
+        android:layout_marginLeft="50dp"
+        android:layout_marginRight="50dp"
+        android:textAppearance="@style/TextAppearance.Compat.Notification.Title"
+        android:textAllCaps="false" />
+
+    <Button
+        android:id="@+id/report_btn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="Report"
+        android:layout_marginLeft="50dp"
+        android:layout_marginRight="50dp"
+        android:textAppearance="@style/TextAppearance.Compat.Notification.Title"
+        android:textAllCaps="false" />
+
+    <Button
+        android:id="@+id/stats_btn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="Statistics of Book"
+        android:layout_marginLeft="50dp"
+        android:layout_marginRight="50dp"
+        android:textAppearance="@style/TextAppearance.Compat.Notification.Title"
+        android:textAllCaps="false" />
+
+    <Button
+        android:id="@+id/inTray_btn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:layout_marginLeft="50dp"
+        android:layout_marginRight="50dp"
+        android:layout_marginBottom="50dp"
+        android:text="Uploaded Documents"
+        android:textAppearance="@style/TextAppearance.Compat.Notification.Title"
+        android:textAllCaps="false" />
+</LinearLayout>

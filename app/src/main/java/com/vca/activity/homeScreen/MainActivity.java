@@ -2,6 +2,7 @@ package com.vca.activity.homeScreen;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.AppCompatImageView;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -9,6 +10,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -16,10 +18,13 @@ import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.webkit.MimeTypeMap;
 import android.widget.Button;
 import android.widget.RelativeLayout;
@@ -32,8 +37,15 @@ import com.dropbox.core.v2.files.FolderMetadata;
 import com.dropbox.core.v2.files.ListFolderResult;
 import com.dropbox.core.v2.files.Metadata;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.scanlibrary.ScanActivity;
+import com.scanlibrary.ScanConstants;
 import com.vca.R;
+import com.vca.activity.InTrayActivity;
+import com.vca.activity.ReportActivity;
 import com.vca.activity.SettingActivity;
+import com.vca.activity.UploadActivity;
+import com.vca.utils.Constants;
+import com.vca.utils.FileUtils;
 import com.vca.utils.dropbox.CreateFileTask;
 import com.vca.utils.dropbox.DeleteFileTask;
 import com.vca.utils.dropbox.DownloadFileTask;
@@ -42,6 +54,7 @@ import com.vca.utils.dropbox.ListFolderTask;
 import com.vca.utils.dropbox.PicassoClient;
 import com.vca.utils.dropbox.UploadFileTask;
 import com.vca.utils.dropbox.UriHelpers;
+import com.viethoa.DialogUtils;
 
 import java.io.File;
 import java.text.DateFormat;
@@ -55,11 +68,21 @@ import butterknife.Unbinder;
 
 public class MainActivity extends AppCompatActivity implements HomeScreenView {
     private static final String TAG = "MainActivity";
-    @BindView(R.id.upload_btn)
-    FloatingActionButton mUploadBtn;
     public Unbinder unbinder;
+  /*  @BindView(R.id.upload_btn)
+    FloatingActionButton mUploadBtn;
     @BindView(R.id.files_list)
-    RecyclerView recyclerView;
+    RecyclerView recyclerView;*/
+
+    @BindView(R.id.upload_btn)
+    public Button mUploadBtn;
+    @BindView(R.id.report_btn)
+    public Button mReportBtn;
+    @BindView(R.id.stats_btn)
+    public Button mStatsBtn;
+    @BindView(R.id.inTray_btn)
+    public Button mInTrayBtn;
+
     HomeScreenPresenter presenter;
     public final static String EXTRA_PATH = "FilesActivity_Path";
     private static final int PICKFILE_REQUEST_CODE = 1;
@@ -75,19 +98,58 @@ public class MainActivity extends AppCompatActivity implements HomeScreenView {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         filePathHistory.push("");
+        FileUtils.mkdir(Constants.LOCAL_Folder_ROOT, null);
+        FileUtils.mkdir(Constants.LOCAL_Folder_UPLOADED_DOCUMENTS, null);
         unbinder = ButterKnife.bind(this);
         presenter = new HomeScreenPresenterImpl(this, this);
         mUploadBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                performWithPermissions(FileAction.UPLOAD);
-//                uploadFile("/storage/emulated/0/PureScanner/Documents/sfb.pdf");
+                String title = "Upload Documents";
+                String message = "Please select your option";
+                String negativeButton = "Camera";
+                String positiveButton = "Gallery";
+                Dialog myDialog = DialogUtils.createDialogMessage(MainActivity.this, title, message,
+                        negativeButton, positiveButton, false, new DialogUtils.DialogListener() {
+                            @Override
+                            public void onPositiveButton() {
+                                performWithPermissions(FileAction.UPLOAD);
+                            }
 
+                            @Override
+                            public void onNegativeButton() { // Camera
+                                Intent intent = new Intent(MainActivity.this, ScanActivity.class);
+                                intent.putExtra(ScanConstants.OPEN_INTENT_PREFERENCE, ScanConstants.OPEN_CAMERA);
+                                startActivityForResult(intent, ScanConstants.START_CAMERA_REQUEST_CODE);
+                            }
+                        });
+
+                if (myDialog != null && !myDialog.isShowing()) {
+                    myDialog.setCanceledOnTouchOutside(true);
+                    myDialog.show();
+                }
+            }
+        });
+
+        mInTrayBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, InTrayActivity.class);
+                startActivity(intent);
+                overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
+            }
+        });
+
+        mReportBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, ReportActivity.class);
+                startActivity(intent);
+                overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
             }
         });
 
         PicassoClient.init(this, DropboxClientFactory.getClient());
-
         mFilesAdapter = new FilesAdapter(this, PicassoClient.getPicasso(), new FilesAdapter.Callback() {
             @Override
             public void onFolderClicked(FolderMetadata folder) {
@@ -131,9 +193,9 @@ public class MainActivity extends AppCompatActivity implements HomeScreenView {
                 }).execute(filePath);
             }
         });
-
+/*
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        recyclerView.setAdapter(mFilesAdapter);
+        recyclerView.setAdapter(mFilesAdapter);*/
         mSelectedFile = null;
     }
 
@@ -168,7 +230,7 @@ public class MainActivity extends AppCompatActivity implements HomeScreenView {
         final ProgressDialog dialog = new ProgressDialog(this);
         dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
         dialog.setCancelable(false);
-        dialog.setMessage("Uploading");
+        dialog.setMessage("Uploading...");
         dialog.show();
 
         new UploadFileTask(this, DropboxClientFactory.getClient(), new UploadFileTask.Callback() {
@@ -185,7 +247,7 @@ public class MainActivity extends AppCompatActivity implements HomeScreenView {
                 Log.e(TAG, "Failed to upload file.", e);
                 Toast.makeText(MainActivity.this, "Failed to upload file", Toast.LENGTH_SHORT).show();
             }
-        }).execute(fileUri, filePathHistory.peek());
+        }).execute(fileUri, Constants.Folder_INTRAY);
     }
 
     @Override
@@ -272,7 +334,7 @@ public class MainActivity extends AppCompatActivity implements HomeScreenView {
 
     @Override
     public void onRefreshFiles() {
-        Log.d(TAG, "onRefreshFiles: ");
+      /*  Log.d(TAG, "onRefreshFiles: ");
         final ProgressDialog dialog = new ProgressDialog(this);
         dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
         dialog.setCancelable(false);
@@ -292,7 +354,7 @@ public class MainActivity extends AppCompatActivity implements HomeScreenView {
                 Log.e(TAG, "Failed to list folder.", e);
                 Toast.makeText(MainActivity.this, "An error has occurred", Toast.LENGTH_SHORT).show();
             }
-        }).execute(filePathHistory.peek());
+        }).execute(filePathHistory.peek());*/
     }
 
     private enum FileAction {
@@ -402,6 +464,25 @@ public class MainActivity extends AppCompatActivity implements HomeScreenView {
                 // This is the result of a call to launchFilePicker
                 uploadFile(data.getData().toString());
             }
+        }
+        if ((requestCode == ScanConstants.START_CAMERA_REQUEST_CODE) && resultCode == Activity.RESULT_OK) {
+            Uri uri = data.getExtras().getParcelable(ScanConstants.SCANNED_RESULT);
+            Log.d(TAG, "onActivityResult: " + uri);
+            uploadFile("" + uri);
+           /* boolean doScanMore = data.getExtras().getBoolean(ScanConstants.SCAN_MORE);
+            FileUriHelpers.getFileForUri(this, uri);
+
+
+            scannedBitmaps.add(uri);
+            if (doScanMore) {
+                Intent intent = new Intent(this, ScanActivity.class);
+                intent.putExtra(ScanConstants.OPEN_INTENT_PREFERENCE, ScanConstants.OPEN_CAMERA);
+                intent.putExtra("PAGE_NUM", scannedBitmaps.size() + 1);
+                startActivityForResult(intent, ScanConstants.START_CAMERA_REQUEST_CODE);
+            } else {
+                uploadFile(uri);
+                CreatePdf(scannedBitmaps);
+            }*/
         }
         super.onActivityResult(requestCode, resultCode, data);
     }

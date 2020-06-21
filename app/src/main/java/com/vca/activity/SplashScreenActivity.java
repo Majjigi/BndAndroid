@@ -15,12 +15,11 @@ import com.vca.utils.NavigationUtils;
 
 public class SplashScreenActivity extends DropboxActivity {
     private final static String TAG = SplashScreenActivity.class.getSimpleName();
-    private static final String[] PERMISSIONS = {Manifest.permission.WRITE_EXTERNAL_STORAGE};
+    private static final String[] PERMISSIONS = {Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.CAMERA};
     private final int SPLASH_SCREEN_TIME_OUT = 3000;
     private int PERMISSION_ALL = 1;
     public NavigationUtils navigationUtils;
     AppPreference appPreference;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

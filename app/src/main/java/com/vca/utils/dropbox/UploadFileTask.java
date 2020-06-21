@@ -9,6 +9,8 @@ import com.dropbox.core.DbxException;
 import com.dropbox.core.v2.DbxClientV2;
 import com.dropbox.core.v2.files.FileMetadata;
 import com.dropbox.core.v2.files.WriteMode;
+import com.vca.utils.FileUtils;
+import com.vca.utils.TimeUtil;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -19,7 +21,6 @@ import java.io.InputStream;
  * Async task to upload a file to a directory
  */
 public class UploadFileTask extends AsyncTask<String, Void, FileMetadata> {
-
     private final Context mContext;
     private final DbxClientV2 mDbxClient;
     private final Callback mCallback;
@@ -56,14 +57,9 @@ public class UploadFileTask extends AsyncTask<String, Void, FileMetadata> {
 
         if (localFile != null) {
             String remoteFolderPath = params[1];
-
-            // Note - this is not ensuring the name is a valid dropbox file name
-            String remoteFileName = localFile.getName();
-            Log.d("Prabhu", "doInBackground: localUri : " + localUri);
-            Log.d("Prabhu", "doInBackground: remoteFolderPath : " + remoteFolderPath);
-
+            String localFileName = localFile.getName();
             try (InputStream inputStream = new FileInputStream(localFile)) {
-                return mDbxClient.files().uploadBuilder(remoteFolderPath + "/" + remoteFileName)
+                return mDbxClient.files().uploadBuilder(remoteFolderPath + "/" + TimeUtil.getCurrentTime() + "." + FileUtils.getFileExtension(localFileName))
                         .withMode(WriteMode.OVERWRITE)
                         .uploadAndFinish(inputStream);
             } catch (DbxException | IOException e) {

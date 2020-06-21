@@ -10,6 +10,7 @@ import com.dropbox.core.v2.files.CreateFolderErrorException;
 import com.dropbox.core.v2.files.CreateFolderResult;
 import com.dropbox.core.v2.files.FileMetadata;
 import com.dropbox.core.v2.files.WriteMode;
+import com.vca.utils.Constants;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -57,10 +58,11 @@ public class CreateFileTask extends AsyncTask<String, Void, CreateFolderBatchLau
         String fileName = params[0];
         try {
             List<String> fileList = new ArrayList<>();
-            fileList.add("/2018");
-            fileList.add("/2019");
-            fileList.add("/2020");
-            fileList.add("/2021/01 General Ledger");
+            fileList.add(Constants.Folder_INTRAY);
+            fileList.add(Constants.Folder_REPORTS);
+            fileList.add(Constants.Folder_RETURNED);
+            fileList.add(Constants.Folder_IN_PROGRESS);
+           /* fileList.add("/2021/01 General Ledger");
             fileList.add("/2021/02 Accounts Receivable");
             fileList.add("/2021/03 Accounts Payable");
             fileList.add("/2021/04 Banking");
@@ -81,7 +83,7 @@ public class CreateFileTask extends AsyncTask<String, Void, CreateFolderBatchLau
             fileList.add("/Masters/Shop & Establishment");
             fileList.add("/Masters/Patents");
             fileList.add("/Masters/TAN");
-            fileList.add("/Masters/Trademarks");
+            fileList.add("/Masters/Trademarks");*/
             return mDbxClient.files().createFolderBatch(fileList);
         } catch (DbxException e) {
             mException = e;

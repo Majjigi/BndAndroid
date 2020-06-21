@@ -24,11 +24,11 @@
 
             <ImageView
                 android:id="@+id/image"
-                android:scaleType="centerCrop"
-                android:layout_gravity="center_vertical"
                 android:layout_width="@dimen/thumbnail_size"
                 android:layout_height="@dimen/thumbnail_size"
-                android:contentDescription="icon"/>
+                android:layout_gravity="center_vertical"
+                android:contentDescription="icon"
+                android:scaleType="centerCrop" />
         </FrameLayout>
 
         <LinearLayout
@@ -40,13 +40,12 @@
 
             <TextView
                 android:id="@+id/text"
-                android:maxLines="1"
-                android:textSize="18sp"
-                android:layout_marginStart="@dimen/global_padding"
-                android:layout_gravity="center_vertical"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
-
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginStart="@dimen/global_padding"
+                android:maxLines="1"
+                android:textSize="18sp" />
         </LinearLayout>
 
         <androidx.appcompat.widget.AppCompatImageButton
@@ -58,7 +57,7 @@
             android:background="@drawable/selectable_item_background_oval"
             android:padding="@dimen/touch_target_icon_padding"
             android:src="@drawable/more_vertical_icon_white_24dp"
-            android:tint="?colorControlNormal" />
+            android:tint="?colorControlNormal"
+            android:visibility="gone" />
     </LinearLayout>
-
 </RelativeLayout>

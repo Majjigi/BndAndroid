@@ -5,10 +5,13 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Environment;
+import android.util.Log;
 
 import com.dropbox.core.DbxException;
 import com.dropbox.core.v2.DbxClientV2;
 import com.dropbox.core.v2.files.FileMetadata;
+import com.vca.utils.Constants;
+import com.vca.utils.FileUtils;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -27,10 +30,11 @@ public class DownloadFileTask extends AsyncTask<FileMetadata, Void, File> {
 
     public interface Callback {
         void onDownloadComplete(File result);
+
         void onError(Exception e);
     }
 
-    public  DownloadFileTask(Context context, DbxClientV2 dbxClient, Callback callback) {
+    public DownloadFileTask(Context context, DbxClientV2 dbxClient, Callback callback) {
         mContext = context;
         mDbxClient = dbxClient;
         mCallback = callback;
@@ -50,8 +54,7 @@ public class DownloadFileTask extends AsyncTask<FileMetadata, Void, File> {
     protected File doInBackground(FileMetadata... params) {
         FileMetadata metadata = params[0];
         try {
-            File path = Environment.getExternalStoragePublicDirectory(
-                    Environment.DIRECTORY_DOWNLOADS);
+            File path = new File(Constants.LOCAL_Folder_UPLOADED_DOCUMENTS);
             File file = new File(path, metadata.getName());
 
             // Make sure the Downloads directory exists.
@@ -67,7 +70,7 @@ public class DownloadFileTask extends AsyncTask<FileMetadata, Void, File> {
             // Download the file.
             try (OutputStream outputStream = new FileOutputStream(file)) {
                 mDbxClient.files().download(metadata.getPathLower(), metadata.getRev())
-                    .download(outputStream);
+                        .download(outputStream);
             }
 
             // Tell android about the file
