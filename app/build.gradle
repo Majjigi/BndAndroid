@@ -40,4 +40,5 @@ dependencies {
     implementation 'androidx.recyclerview:recyclerview:1.1.0'
     implementation 'com.github.viethoa:customdialogs:3.0.0'
     implementation project(':scanlibrary')
+    implementation 'com.evrencoskun.library:tableview:0.8.9.2'
 }

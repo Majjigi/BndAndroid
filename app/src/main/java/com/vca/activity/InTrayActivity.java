@@ -44,7 +44,7 @@ public class InTrayActivity extends AppCompatActivity {
     RecyclerView recyclerView;
     private FilesAdapter mFilesAdapter;
     private FileMetadata mSelectedFile;
-
+    ProgressDialog dialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,7 +67,7 @@ public class InTrayActivity extends AppCompatActivity {
             public void onFileClicked(final FileMetadata file) {
                 mSelectedFile = file;
                 if (mSelectedFile != null) {
-                    if (FileUtils.isFileAvailableInLocal(file.getName())) {
+                    if (FileUtils.isFileAvailableInLocal(Constants.LOCAL_Folder_UPLOADED_DOCUMENTS, file.getName())) {
                         openFile(new File(Constants.LOCAL_Folder_UPLOADED_DOCUMENTS + file.getName()));
                     } else {
                         downloadFile(mSelectedFile);
@@ -113,15 +113,26 @@ public class InTrayActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
+        dialog = new ProgressDialog(this);
+        dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        dialog.setCancelable(false);
+        dialog.setMessage("Loading...");
+        dialog.show();
         new ListFolderTask(DropboxClientFactory.getClient(), new ListFolderTask.Callback() {
             @Override
             public void onDataLoaded(ListFolderResult result) {
+                if (dialog!= null){
+                    dialog.dismiss();
+                }
                 mFilesAdapter.setFiles(result.getEntries());
             }
 
             @Override
             public void onError(Exception e) {
                 Log.e(TAG, "Failed to list folder.", e);
+                if (dialog!= null){
+                    dialog.dismiss();
+                }
                 Toast.makeText(InTrayActivity.this, "An error has occurred", Toast.LENGTH_SHORT).show();
             }
         }).execute(Constants.Folder_INTRAY);
@@ -178,7 +189,7 @@ public class InTrayActivity extends AppCompatActivity {
                         Toast.LENGTH_SHORT)
                         .show();
             }
-        }).execute(file);
+        }).execute(file, Constants.LOCAL_Folder_UPLOADED_DOCUMENTS);
     }
 
     private void openFile(File url) {
@@ -240,6 +251,4 @@ public class InTrayActivity extends AppCompatActivity {
             Toast.makeText(this, "No application found which can open the file", Toast.LENGTH_SHORT).show();
         }
     }
-
-
 }

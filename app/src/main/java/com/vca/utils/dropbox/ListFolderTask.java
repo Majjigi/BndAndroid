@@ -1,10 +1,12 @@
 package com.vca.utils.dropbox;
 
 import android.os.AsyncTask;
+import android.util.Log;
 
 import com.dropbox.core.DbxException;
 import com.dropbox.core.v2.DbxClientV2;
 import com.dropbox.core.v2.files.ListFolderResult;
+import com.dropbox.core.v2.files.Metadata;
 
 /**
  * Async task to list items in a folder

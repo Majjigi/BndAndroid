@@ -14,4 +14,10 @@
     <color name="grad_back_bot">#02A6FF</color>
 
     <color name="file_icon_red">#DB4437</color>
+
+    <!-- Table View -->
+    <color name="bg_line">#E7E7E7</color>
+    <color name="cell_background_color">#ffffff</color>
+    <color name="header_line_color">@android:color/holo_red_light</color>
+    <color name="table_view_default_text_color">#0a0a0a</color>
 </resources>

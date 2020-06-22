@@ -21,7 +21,7 @@ import java.io.OutputStream;
 /**
  * Task to download a file from Dropbox and put it in the Downloads folder
  */
-public class DownloadFileTask extends AsyncTask<FileMetadata, Void, File> {
+public class DownloadFileTask extends AsyncTask<Object, Void, File> {
 
     private final Context mContext;
     private final DbxClientV2 mDbxClient;
@@ -51,10 +51,10 @@ public class DownloadFileTask extends AsyncTask<FileMetadata, Void, File> {
     }
 
     @Override
-    protected File doInBackground(FileMetadata... params) {
-        FileMetadata metadata = params[0];
+    protected File doInBackground(Object... params) {
+        FileMetadata metadata = (FileMetadata) params[0];
         try {
-            File path = new File(Constants.LOCAL_Folder_UPLOADED_DOCUMENTS);
+            File path = new File((String) params[1]);
             File file = new File(path, metadata.getName());
 
             // Make sure the Downloads directory exists.

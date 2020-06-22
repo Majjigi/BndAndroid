@@ -37,8 +37,8 @@ public class FileUtils {
             return false;
     }
 
-    public static boolean isFileAvailableInLocal(String fileName) {
-        for (File localFile : getAllFiles(Constants.LOCAL_Folder_UPLOADED_DOCUMENTS)) {
+    public static boolean isFileAvailableInLocal(String sourceFolder, String fileName) {
+        for (File localFile : getAllFiles(sourceFolder)) {
             Log.d(TAG, "isFileAvailableInLocal: "+localFile.getName());
             if (localFile.getName().equalsIgnoreCase(fileName)) {
                 return true;
