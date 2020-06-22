@@ -9,9 +9,13 @@ import java.util.Calendar;
 public class TimeUtil {
     public static String getCurrentTime() {
         DateFormat df = new SimpleDateFormat("ddMMYHHmmss");
-        DateFormat df1 = new SimpleDateFormat("ddMMYYHHmmss");
-        DateFormat df2 = new SimpleDateFormat("ddMMyHHmmss");
-        DateFormat df3 = new SimpleDateFormat("ddMMYYYYHHmmss");
+        String time = df.format(Calendar.getInstance().getTime());
+        Log.d("prabhu", "getCurrentTime: df " + time);
+        return time;
+    }
+
+    public static String getCurrentDate() {
+        DateFormat df = new SimpleDateFormat("dd-MM-YYYY");
         String time = df.format(Calendar.getInstance().getTime());
         Log.d("prabhu", "getCurrentTime: df " + time);
         return time;

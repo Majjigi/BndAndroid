@@ -43,6 +43,7 @@ import com.vca.R;
 import com.vca.activity.InTrayActivity;
 import com.vca.activity.ReportActivity;
 import com.vca.activity.SettingActivity;
+import com.vca.activity.StatsActivity;
 import com.vca.activity.UploadActivity;
 import com.vca.utils.Constants;
 import com.vca.utils.FileUtils;
@@ -144,6 +145,15 @@ public class MainActivity extends AppCompatActivity implements HomeScreenView {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(MainActivity.this, ReportActivity.class);
+                startActivity(intent);
+                overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
+            }
+        });
+
+        mStatsBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, StatsActivity.class);
                 startActivity(intent);
                 overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
             }
