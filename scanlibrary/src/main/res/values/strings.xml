@@ -2,7 +2,7 @@
 <resources>
     <string name="app_name">ScanLibrary</string>
     <string name="scanning">Scanning</string>
-    <string name="done">Save</string>
+    <string name="done">Upload</string>
     <string name="scan">Next</string>
     <string name="cantCrop">Cant crop the image, change the points</string>
     <string name="ok">Ok</string>

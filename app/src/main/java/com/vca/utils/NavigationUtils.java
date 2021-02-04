@@ -9,6 +9,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
+import com.vca.activity.LoginActivity;
 import com.vca.activity.homeScreen.MainActivity;
 import com.vca.activity.DropBoxSetupActivity;
 
@@ -35,7 +36,7 @@ public class NavigationUtils {
     @TargetApi(21)
     public void navigateToHomeActivity() {
         Log.d(TAG, "gotoHomeScreen");
-        Intent intent = new Intent(mContext, MainActivity.class);
+        Intent intent = new Intent(mContext, LoginActivity.class);
         mContext.startActivity(intent);
     }
 

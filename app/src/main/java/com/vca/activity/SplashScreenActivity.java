@@ -51,7 +51,7 @@ public class SplashScreenActivity extends DropboxActivity {
             @Override
             public void run() {
                 if (appPreference.isFirstTime() || !hasToken()) {
-                    navigationUtils.navigateToDropBoxSetUpActivity();
+                    navigationUtils.navigateToHomeActivity();
                 } else {
                     navigationUtils.navigateToHomeActivity();
                 }

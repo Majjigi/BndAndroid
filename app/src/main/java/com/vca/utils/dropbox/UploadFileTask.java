@@ -1,6 +1,7 @@
 package com.vca.utils.dropbox;
 
 import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.util.Log;
@@ -16,11 +17,12 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 
 /**
  * Async task to upload a file to a directory
  */
-public class UploadFileTask extends AsyncTask<String, Void, FileMetadata> {
+public class UploadFileTask extends AsyncTask<List<String>, Integer, FileMetadata> {
     private final Context mContext;
     private final DbxClientV2 mDbxClient;
     private final Callback mCallback;
@@ -28,6 +30,8 @@ public class UploadFileTask extends AsyncTask<String, Void, FileMetadata> {
 
     public interface Callback {
         void onUploadComplete(FileMetadata result);
+
+        void onUploadProgressUpdate(int progress);
 
         void onError(Exception e);
     }
@@ -43,30 +47,41 @@ public class UploadFileTask extends AsyncTask<String, Void, FileMetadata> {
         super.onPostExecute(result);
         if (mException != null) {
             mCallback.onError(mException);
-        } else if (result == null) {
-            mCallback.onError(null);
         } else {
             mCallback.onUploadComplete(result);
         }
     }
 
     @Override
-    protected FileMetadata doInBackground(String... params) {
-        String localUri = params[0];
-        File localFile = UriHelpers.getFileForUri(mContext, Uri.parse(localUri));
+    protected FileMetadata doInBackground(List<String>... params) {
+        List<String> uriList = params[0];
+        Log.d("DEBUG", "doInBackground: uriList.size() : " + uriList.size());
 
-        if (localFile != null) {
-            String remoteFolderPath = params[1];
-            String localFileName = localFile.getName();
-            try (InputStream inputStream = new FileInputStream(localFile)) {
-                return mDbxClient.files().uploadBuilder(remoteFolderPath + "/" + TimeUtil.getCurrentTime() + "." + FileUtils.getFileExtension(localFileName))
-                        .withMode(WriteMode.OVERWRITE)
-                        .uploadAndFinish(inputStream);
-            } catch (DbxException | IOException e) {
-                mException = e;
+        for (int i = 0; i < uriList.size(); i++) {
+            publishProgress((i+1));
+            String localUri = uriList.get(i);
+            File localFile = UriHelpers.getFileForUri(mContext, Uri.parse(localUri));
+            Log.d("DEBUG", "doInBackground: " + localFile.getName());
+
+            if (localFile != null) {
+                String remoteFolderPath = params[1].get(0);
+                String localFileName = localFile.getName();
+                try (InputStream inputStream = new FileInputStream(localFile)) {
+                    mDbxClient.files().uploadBuilder(remoteFolderPath + "/" + TimeUtil.getCurrentTime() + "." + FileUtils.getFileExtension(localFileName)).withMode(WriteMode.OVERWRITE).uploadAndFinish(inputStream);
+                } catch (DbxException | IOException e) {
+                    mException = e;
+                }
             }
         }
-
         return null;
+    }
+
+    @Override
+    protected void onProgressUpdate(Integer... values) {
+        if (values[0] == -1) {
+            mCallback.onError(null);
+        } else {
+            mCallback.onUploadProgressUpdate(values[0]);
+        }
     }
 }

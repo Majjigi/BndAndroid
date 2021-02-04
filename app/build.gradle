@@ -8,14 +8,16 @@ android {
         minSdkVersion 24
         targetSdkVersion 29
         versionCode 1
-        versionName "1.0.1"
+        versionName "1.0.3"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled true
+            shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
+
     }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
@@ -41,4 +43,7 @@ dependencies {
     implementation 'com.github.viethoa:customdialogs:3.0.0'
     implementation project(':scanlibrary')
     implementation 'com.evrencoskun.library:tableview:0.8.9.2'
+
+    implementation 'com.android.volley:volley:1.1.1'
+
 }

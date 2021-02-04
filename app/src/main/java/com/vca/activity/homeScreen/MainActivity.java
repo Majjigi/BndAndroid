@@ -12,6 +12,7 @@ import android.Manifest;
 import android.app.Activity;
 import android.app.Dialog;
 import android.app.ProgressDialog;
+import android.content.ClipData;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -41,10 +42,12 @@ import com.scanlibrary.ScanActivity;
 import com.scanlibrary.ScanConstants;
 import com.vca.R;
 import com.vca.activity.InTrayActivity;
+import com.vca.activity.LoginActivity;
 import com.vca.activity.ReportActivity;
 import com.vca.activity.SettingActivity;
 import com.vca.activity.StatsActivity;
 import com.vca.activity.UploadActivity;
+import com.vca.activity.UploadType;
 import com.vca.utils.Constants;
 import com.vca.utils.FileUtils;
 import com.vca.utils.dropbox.CreateFileTask;
@@ -59,6 +62,7 @@ import com.viethoa.DialogUtils;
 
 import java.io.File;
 import java.text.DateFormat;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Queue;
 import java.util.Stack;
@@ -93,9 +97,17 @@ public class MainActivity extends AppCompatActivity implements HomeScreenView {
     private long exitTime;
     private final static int EXIT_TIME = 2000;
     public static Stack<String> filePathHistory = new Stack<>();
+    private List<String> scannedBitmaps = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
+        String gottoken = getIntent().getExtras().getString("token");
+        String gotemail = getIntent().getExtras().getString("email");
+        Toast.makeText(MainActivity.this, "^^^^^^^"+gottoken ,Toast.LENGTH_LONG).show();
+        Toast.makeText(MainActivity.this, "^^^^^^^"+gotemail ,Toast.LENGTH_LONG).show();
+
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         filePathHistory.push("");
@@ -106,29 +118,36 @@ public class MainActivity extends AppCompatActivity implements HomeScreenView {
         mUploadBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String title = "Upload Documents";
-                String message = "Please select your option";
-                String negativeButton = "Camera";
-                String positiveButton = "Gallery";
-                Dialog myDialog = DialogUtils.createDialogMessage(MainActivity.this, title, message,
-                        negativeButton, positiveButton, false, new DialogUtils.DialogListener() {
-                            @Override
-                            public void onPositiveButton() {
-                                performWithPermissions(FileAction.UPLOAD);
-                            }
+//                scannedBitmaps.clear();
+//                String title = "Upload Documents";
+//                String message = "Please select your option";
+//                String negativeButton = "Camera";
+//                String positiveButton = "Gallery";
+//                Dialog myDialog = DialogUtils.createDialogMessage(MainActivity.this, title, message,
+//                        negativeButton, positiveButton, false, new DialogUtils.DialogListener() {
+//                            @Override
+//                            public void onPositiveButton() {
+//                                performWithPermissions(FileAction.UPLOAD);
+//                            }
+//
+//                            @Override
+//                            public void onNegativeButton() { // Camera
+//                                Intent intent = new Intent(MainActivity.this, ScanActivity.class);
+//                                intent.putExtra(ScanConstants.OPEN_INTENT_PREFERENCE, ScanConstants.OPEN_CAMERA);
+//                                startActivityForResult(intent, ScanConstants.START_CAMERA_REQUEST_CODE);
+//                            }
+//                        });
+//
+//                if (myDialog != null && !myDialog.isShowing()) {
+//                    myDialog.setCanceledOnTouchOutside(true);
+//                    myDialog.show();
+//                }
 
-                            @Override
-                            public void onNegativeButton() { // Camera
-                                Intent intent = new Intent(MainActivity.this, ScanActivity.class);
-                                intent.putExtra(ScanConstants.OPEN_INTENT_PREFERENCE, ScanConstants.OPEN_CAMERA);
-                                startActivityForResult(intent, ScanConstants.START_CAMERA_REQUEST_CODE);
-                            }
-                        });
+                Intent i=new Intent(MainActivity.this, UploadType.class);
+                i.putExtra("sendtoken",gottoken);
+                i.putExtra("sendemail",gotemail);
+                startActivity(i);
 
-                if (myDialog != null && !myDialog.isShowing()) {
-                    myDialog.setCanceledOnTouchOutside(true);
-                    myDialog.show();
-                }
             }
         });
 
@@ -236,19 +255,27 @@ public class MainActivity extends AppCompatActivity implements HomeScreenView {
         }
     }
 
-    private void uploadFile(String fileUri) {
+    private void uploadFile(List<String> fileUri) {
         final ProgressDialog dialog = new ProgressDialog(this);
         dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
         dialog.setCancelable(false);
         dialog.setMessage("Uploading...");
         dialog.show();
+        List<String> inTrayPath = new ArrayList<String>();
+
+        inTrayPath.add(Constants.Folder_INTRAY);
 
         new UploadFileTask(this, DropboxClientFactory.getClient(), new UploadFileTask.Callback() {
             @Override
-            public void onUploadComplete(FileMetadata result) {
+            public void onUploadComplete(FileMetadata r) {
                 dialog.dismiss();
-                String message = result.getName() + " size " + result.getSize() + " modified " + DateFormat.getDateTimeInstance().format(result.getClientModified());
                 Toast.makeText(MainActivity.this, "File Uploaded", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onUploadProgressUpdate(int progress) {
+                Log.d(TAG, "onUploadProgressUpdate: " + progress);
+                dialog.setMessage("Uploading...   " + progress + " of " + fileUri.size());
             }
 
             @Override
@@ -257,7 +284,7 @@ public class MainActivity extends AppCompatActivity implements HomeScreenView {
                 Log.e(TAG, "Failed to upload file.", e);
                 Toast.makeText(MainActivity.this, "Failed to upload file", Toast.LENGTH_SHORT).show();
             }
-        }).execute(fileUri, Constants.Folder_INTRAY);
+        }).execute(fileUri, inTrayPath);
     }
 
     @Override
@@ -414,10 +441,17 @@ public class MainActivity extends AppCompatActivity implements HomeScreenView {
 
     private void launchFilePicker() {
         // Launch intent to pick file for upload
-        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-        intent.addCategory(Intent.CATEGORY_OPENABLE);
-        intent.setType("*/*");
-        startActivityForResult(intent, PICKFILE_REQUEST_CODE);
+//        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+//        intent.addCategory(Intent.CATEGORY_OPENABLE);
+//        intent.setType("*/*");
+//        startActivityForResult(intent, PICKFILE_REQUEST_CODE);
+
+        Intent filesIntent;
+        filesIntent = new Intent(Intent.ACTION_GET_CONTENT);
+        filesIntent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
+        filesIntent.addCategory(Intent.CATEGORY_OPENABLE);
+        filesIntent.setType("*/*");  //use image/* for photos, etc.
+        startActivityForResult(filesIntent, PICKFILE_REQUEST_CODE);
     }
 
     private void downloadFile(FileMetadata file) {
@@ -472,27 +506,36 @@ public class MainActivity extends AppCompatActivity implements HomeScreenView {
         if (requestCode == PICKFILE_REQUEST_CODE) {
             if (resultCode == RESULT_OK) {
                 // This is the result of a call to launchFilePicker
-                uploadFile(data.getData().toString());
+                List<String> scannedImage = new ArrayList<>();
+
+                if (data.getClipData() == null) {
+                    scannedImage.add(data.getData().toString());
+                    uploadFile(scannedImage);
+                } else {
+                    ClipData clipData = data.getClipData();
+                    for (int i = 0; i < clipData.getItemCount(); i++) {
+                        {
+                            scannedImage.add(clipData.getItemAt(i).getUri().toString());
+                        }
+                    }
+                    uploadFile(scannedImage);
+                }
             }
         }
         if ((requestCode == ScanConstants.START_CAMERA_REQUEST_CODE) && resultCode == Activity.RESULT_OK) {
             Uri uri = data.getExtras().getParcelable(ScanConstants.SCANNED_RESULT);
             Log.d(TAG, "onActivityResult: " + uri);
-            uploadFile("" + uri);
-           /* boolean doScanMore = data.getExtras().getBoolean(ScanConstants.SCAN_MORE);
-            FileUriHelpers.getFileForUri(this, uri);
-
-
-            scannedBitmaps.add(uri);
+            boolean doScanMore = data.getExtras().getBoolean(ScanConstants.SCAN_MORE);
+            scannedBitmaps.add("" + uri);
             if (doScanMore) {
                 Intent intent = new Intent(this, ScanActivity.class);
                 intent.putExtra(ScanConstants.OPEN_INTENT_PREFERENCE, ScanConstants.OPEN_CAMERA);
                 intent.putExtra("PAGE_NUM", scannedBitmaps.size() + 1);
                 startActivityForResult(intent, ScanConstants.START_CAMERA_REQUEST_CODE);
             } else {
-                uploadFile(uri);
-                CreatePdf(scannedBitmaps);
-            }*/
+                Log.d(TAG, "onActivityResult: " + scannedBitmaps.size());
+                uploadFile(scannedBitmaps);
+            }
         }
         super.onActivityResult(requestCode, resultCode, data);
     }
@@ -512,4 +555,8 @@ public class MainActivity extends AppCompatActivity implements HomeScreenView {
             onRefreshFiles();
         }
     }
+
+
+
+
 }

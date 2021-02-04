@@ -12,10 +12,14 @@
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
+        android:requestLegacyExternalStorage="true"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme">
-        <activity android:name=".activity.StatsActivity"></activity>
+        android:theme="@style/AppTheme"
+        android:usesCleartextTraffic="true">
+        <activity android:name=".activity.UploadType"></activity>
+        <activity android:name=".activity.LoginActivity" />
+        <activity android:name=".activity.StatsActivity" />
         <activity android:name=".activity.ReportActivity" />
         <activity android:name=".activity.InTrayActivity" />
         <activity android:name=".activity.UploadActivity" />
